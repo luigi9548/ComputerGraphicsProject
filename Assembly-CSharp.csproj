@@ -69,12 +69,14 @@
     <Compile Include="Assets\Scripts\CameraRandomizer.cs" />
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\FaceManagement\FaceMesh.cs" />
     <Compile Include="Assets\Kevin Iglesias\Human Animations\Scripts\SpineProxy.cs" />
+    <Compile Include="Assets\Scripts\CharacterRandomizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\Weapon Bundle HOT\ExtractME\ReadMe.txt" />
     <None Include="Assets\Kevin Iglesias\Human Animations\Unity Demo Scenes\Human Basic Motions\Shaders\HumanBasicMotionsScene.shader" />
     <None Include="Assets\Fantasy Skybox FREE\Readme.txt" />
     <None Include="Assets\ithappy\Creative_Characters_FREE\Render_Pipeline_Convert\Documentation.txt" />

@@ -17,11 +17,9 @@ MonoBehaviour:
     id: 1
   - label: victim
     id: 2
-  - label: standerby
+  - label: bystander
     id: 3
-  - label: baseball_bat
+  - label: weapon
     id: 4
-  - label: knife
-    id: 5
   autoAssignIds: 1
   startingLabelId: 1
