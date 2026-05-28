@@ -71,7 +71,6 @@
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\FaceManagement\FaceMesh.cs" />
     <Compile Include="Assets\Scripts\CharacterRandomizer.cs" />
     <Compile Include="Assets\Kevin Iglesias\Human Animations\Scripts\SpineProxy.cs" />
-    <Compile Include="Assets\Scripts\DepthCameraCapture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
