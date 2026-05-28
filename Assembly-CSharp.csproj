@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\Extensions\StringExtensions.cs" />
     <Compile Include="Assets\Scripts\SkyboxRandomizer.cs" />
+    <Compile Include="Assets\Scripts\PostProcessingRandomizer.cs" />
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\FaceManagement\FaceType.cs" />
     <Compile Include="Assets\Kevin Iglesias\Human Animations\Unity Demo Scenes\Human Basic Motions\Script\HumanBasicMotionsDemo.cs" />
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\Character_Controller\MovePlayerInput.cs" />
@@ -68,8 +69,9 @@
     <Compile Include="Assets\Scripts\WalkPath.cs" />
     <Compile Include="Assets\Scripts\CameraRandomizer.cs" />
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\FaceManagement\FaceMesh.cs" />
-    <Compile Include="Assets\Kevin Iglesias\Human Animations\Scripts\SpineProxy.cs" />
     <Compile Include="Assets\Scripts\CharacterRandomizer.cs" />
+    <Compile Include="Assets\Kevin Iglesias\Human Animations\Scripts\SpineProxy.cs" />
+    <Compile Include="Assets\Scripts\DepthCameraCapture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

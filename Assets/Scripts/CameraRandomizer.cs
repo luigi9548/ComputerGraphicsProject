@@ -6,32 +6,54 @@ using Random = UnityEngine.Random;
 [AddRandomizerMenu("Custom/Camera Randomizer")]
 public class CameraRandomizer : Randomizer
 {
-    [Header("Position Offset Range")]
-    public float positionRangeX = 2.0f;
-    public float positionRangeY = 0.5f;
-    public float positionRangeZ = 2.0f;
+    [System.Serializable]
+    public class CameraPosition
+    {
+        public string positionName;
+        public Transform basePosition;
+        public float maxPositionOffset = 0.3f;
+        public float maxRotationOffset = 5f;
+        public float fovMin = 50f;
+        public float fovMax = 80f;
+    }
 
-    [Header("Rotation Offset Range (degrees)")]
-    public float rotationRangeX = 10f;
-    public float rotationRangeY = 15f;
+    public CameraPosition[] cameraPositions;
 
-    [Header("Base Transform")]
-    public Vector3 basePosition = new Vector3(4.5f, 1.6f, -2.0f);
-    public Vector3 baseRotation = new Vector3(10f, 0f, 0f);
+    private Camera mainCamera;
+
+    protected override void OnAwake()
+    {
+        mainCamera = Camera.main;
+    }
 
     protected override void OnIterationStart()
     {
-        Camera mainCamera = Camera.main;
-        if (mainCamera == null) return;
+        if (cameraPositions == null || cameraPositions.Length == 0) return;
 
-        float randomX = basePosition.x + Random.Range(-positionRangeX, positionRangeX);
-        float randomY = basePosition.y + Random.Range(-positionRangeY, positionRangeY);
-        float randomZ = basePosition.z + Random.Range(-positionRangeZ, positionRangeZ);
+        // Scegli casualmente uno dei punti base
+        int index = Random.Range(0, cameraPositions.Length);
+        CameraPosition selected = cameraPositions[index];
 
-        float randomRotX = baseRotation.x + Random.Range(-rotationRangeX, rotationRangeX);
-        float randomRotY = baseRotation.y + Random.Range(-rotationRangeY, rotationRangeY);
+        if (selected.basePosition == null) return;
 
-        mainCamera.transform.position = new Vector3(randomX, randomY, randomZ);
-        mainCamera.transform.rotation = Quaternion.Euler(randomRotX, randomRotY, 0f);
+        // Applica piccolo offset di posizione intorno al punto base
+        Vector3 positionOffset = new Vector3(
+            Random.Range(-selected.maxPositionOffset, selected.maxPositionOffset),
+            Random.Range(-selected.maxPositionOffset * 0.5f, selected.maxPositionOffset * 0.5f),
+            Random.Range(-selected.maxPositionOffset, selected.maxPositionOffset)
+        );
+        mainCamera.transform.position = selected.basePosition.position + positionOffset;
+
+        // Applica piccola variazione di rotazione intorno alla rotazione base
+        Vector3 baseRotation = selected.basePosition.rotation.eulerAngles;
+        Vector3 rotationOffset = new Vector3(
+            Random.Range(-selected.maxRotationOffset, selected.maxRotationOffset),
+            Random.Range(-selected.maxRotationOffset, selected.maxRotationOffset),
+            0
+        );
+        mainCamera.transform.rotation = Quaternion.Euler(baseRotation + rotationOffset);
+
+        // Applica FOV casuale nel range definito per questo punto
+        mainCamera.fieldOfView = Random.Range(selected.fovMin, selected.fovMax);
     }
 }
