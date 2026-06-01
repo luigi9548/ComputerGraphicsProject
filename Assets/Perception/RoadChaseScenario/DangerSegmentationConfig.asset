@@ -19,6 +19,6 @@ MonoBehaviour:
     color: {r: 1, g: 0, b: 0, a: 1}
   - label: bystander
     color: {r: 1, g: 1, b: 1, a: 1}
-  - label: gun
+  - label: weapon
     color: {r: 0, g: 0, b: 1, a: 1}
   skyColor: {r: 0, g: 0, b: 0, a: 1}

@@ -58,10 +58,12 @@
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\Extensions\StringExtensions.cs" />
     <Compile Include="Assets\Scripts\SkyboxRandomizer.cs" />
     <Compile Include="Assets\Scripts\PostProcessingRandomizer.cs" />
+    <Compile Include="Assets\Scripts\ViolenceRandomizer.cs" />
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\FaceManagement\FaceType.cs" />
     <Compile Include="Assets\Kevin Iglesias\Human Animations\Unity Demo Scenes\Human Basic Motions\Script\HumanBasicMotionsDemo.cs" />
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\Character_Controller\MovePlayerInput.cs" />
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\FaceManagement\FacePicker.cs" />
+    <Compile Include="Assets\Scripts\CustomMetricsLabeler.cs" />
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\Character_Controller\ThirdPersonCamera.cs" />
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\Character_Controller\PlayerCamera.cs" />
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\Character_Controller\CharacterMover.cs" />

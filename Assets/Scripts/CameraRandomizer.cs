@@ -21,6 +21,10 @@ public class CameraRandomizer : Randomizer
 
     private Camera mainCamera;
 
+    // Valori correnti letti dal CustomMetricsLabeler
+    public static string CurrentCameraName = "";
+    public static float CurrentCameraFov = 0f;
+
     protected override void OnAwake()
     {
         mainCamera = Camera.main;
@@ -55,5 +59,9 @@ public class CameraRandomizer : Randomizer
 
         // Applica FOV casuale nel range definito per questo punto
         mainCamera.fieldOfView = Random.Range(selected.fovMin, selected.fovMax);
+
+        // Espone i valori correnti per il labeler
+        CurrentCameraName = selected.positionName;
+        CurrentCameraFov = mainCamera.fieldOfView;
     }
 }

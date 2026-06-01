@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Perception.Randomization.Randomizers;
+using System;
+using Random = UnityEngine.Random;
 
 [AddRandomizerMenu("Custom/Post Processing Randomizer")]
 public class PostProcessingRandomizer : Randomizer
@@ -25,6 +27,10 @@ public class PostProcessingRandomizer : Randomizer
     private FilmGrain filmGrain;
     private Vignette vignette;
 
+    // Valori applicati nell'iterazione corrente, letti dal CustomMetricsLabeler
+    // Ordine: [contrast, saturation, grain, vignette]
+    public static float[] CurrentPostProcessing = new float[] { 0f, 0f, 0f, 0f };
+
     protected override void OnAwake()
     {
         volume = GameObject.Find("Global Volume").GetComponent<Volume>();
@@ -42,20 +48,29 @@ public class PostProcessingRandomizer : Randomizer
 
     protected override void OnIterationStart()
     {
+        // Calcola i valori una volta sola, cosi' li applichi e li registri coerenti
+        float contrast = Random.Range(contrastMin, contrastMax);
+        float saturation = Random.Range(saturationMin, saturationMax);
+        float grain = Random.Range(grainIntensityMin, grainIntensityMax);
+        float vignetteVal = Random.Range(vignetteIntensityMin, vignetteIntensityMax);
+
         if (colorAdjustments != null)
         {
-            colorAdjustments.contrast.value = Random.Range(contrastMin, contrastMax);
-            colorAdjustments.saturation.value = Random.Range(saturationMin, saturationMax);
+            colorAdjustments.contrast.value = contrast;
+            colorAdjustments.saturation.value = saturation;
         }
 
         if (filmGrain != null)
         {
-            filmGrain.intensity.value = Random.Range(grainIntensityMin, grainIntensityMax);
+            filmGrain.intensity.value = grain;
         }
 
         if (vignette != null)
         {
-            vignette.intensity.value = Random.Range(vignetteIntensityMin, vignetteIntensityMax);
+            vignette.intensity.value = vignetteVal;
         }
+
+        // Espone i valori applicati per il labeler
+        CurrentPostProcessing = new float[] { contrast, saturation, grain, vignetteVal };
     }
 }
