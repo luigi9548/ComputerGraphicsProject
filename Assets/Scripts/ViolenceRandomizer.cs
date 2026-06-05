@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.Perception.Randomization.Randomizers;
 using UnityEngine.Perception.GroundTruth;
@@ -7,6 +7,26 @@ using Random = UnityEngine.Random;
 [AddRandomizerMenu("Custom/Violence Randomizer")]
 public class ViolenceRandomizer : Randomizer
 {
+    // Personaggio di un ruolo, con anchor di posizione opzionali.
+    // Se entrambi gli anchor sono vuoti, la posizione NON viene toccata
+    // (compatibile con personaggi mossi da altri randomizer, es. WalkPath).
+    [Serializable]
+    public class ViolenceActor
+    {
+        public GameObject character;
+
+        [Header("Anchor di posizione (opzionali)")]
+        [Tooltip("Anchor (GameObject vuoto) con posizione/rotazione per i due stati. " +
+                 "Se entrambi vuoti la posizione non viene toccata. Se solo uno e' impostato, " +
+                 "nell'altro stato il personaggio torna alla posizione originale.")]
+        public Transform calmAnchor;
+        public Transform violentAnchor;
+
+        // Posa originale catturata a inizio scenario (fallback e ripristino)
+        [NonSerialized] public Vector3 originalPosition;
+        [NonSerialized] public Quaternion originalRotation;
+    }
+
     [Range(0f, 1f)]
     public float violenceProbability = 0.5f;
 
@@ -22,32 +42,23 @@ public class ViolenceRandomizer : Randomizer
     public GameObject[] aggressorGroups;
 
     [Header("Vittime (label dinamica + animazione)")]
-    public GameObject[] victimVariants;
+    public ViolenceActor[] victimVariants;
     public string victimViolentLabel = "victim";
-    public string victimNonViolentLabel = "standerby";
+    public string victimNonViolentLabel = "bystander";
 
     [Header("Passanti che reagiscono (solo animazione)")]
-    public GameObject[] reactingBystanders;
+    public ViolenceActor[] reactingBystanders;
 
     [Header("Passanti che si girano verso la scena")]
     [Tooltip("Bystander che parlano tra loro e si voltano verso la violenza quando inizia")]
-    public GameObject[] turningBystanders;
-
-    // Memorizza la rotazione originale (di conversazione) di ogni turning bystander
-    private Quaternion[] originalRotations;
+    public ViolenceActor[] turningBystanders;
 
     protected override void OnScenarioStart()
     {
-        // Cattura la rotazione iniziale impostata nell'editor (i bystander che parlano)
-        if (turningBystanders != null)
-        {
-            originalRotations = new Quaternion[turningBystanders.Length];
-            for (int i = 0; i < turningBystanders.Length; i++)
-            {
-                if (turningBystanders[i] != null)
-                    originalRotations[i] = turningBystanders[i].transform.rotation;
-            }
-        }
+        // Cattura la posa originale di tutti gli attori dei tre ruoli
+        CaptureOriginals(victimVariants);
+        CaptureOriginals(reactingBystanders);
+        CaptureOriginals(turningBystanders);
     }
 
     protected override void OnIterationStart()
@@ -61,36 +72,76 @@ public class ViolenceRandomizer : Randomizer
                 group.SetActive(isViolent);
         }
 
-        // 2. Vittime: animazione randomizzata + label dinamica
+        // 2. Vittime: posizione opzionale + animazione randomizzata + label dinamica
         foreach (var victim in victimVariants)
         {
-            if (victim == null) continue;
-            PlayRandomizedAnimation(victim, isViolent);
-            SetLabel(victim, isViolent ? victimViolentLabel : victimNonViolentLabel);
+            if (victim == null || victim.character == null) continue;
+
+            ApplyAnchor(victim, isViolent, applyRotation: true);
+            PlayRandomizedAnimation(victim.character, isViolent);
+            SetLabel(victim.character, isViolent ? victimViolentLabel : victimNonViolentLabel);
         }
 
-        // 3. Passanti che reagiscono (solo animazione)
+        // 3. Passanti che reagiscono: posizione opzionale + animazione
         foreach (var bystander in reactingBystanders)
         {
-            if (bystander != null)
-                PlayRandomizedAnimation(bystander, isViolent);
+            if (bystander == null || bystander.character == null) continue;
+
+            ApplyAnchor(bystander, isViolent, applyRotation: true);
+            PlayRandomizedAnimation(bystander.character, isViolent);
         }
 
-        // 4. Passanti che si girano: animazione + rotazione
-        if (turningBystanders != null)
+        // 4. Passanti che si girano: posizione opzionale + animazione + rotazione
+        //    (la rotazione e' gestita da FaceTarget / posa originale, non dall'anchor)
+        foreach (var b in turningBystanders)
         {
-            for (int i = 0; i < turningBystanders.Length; i++)
+            if (b == null || b.character == null) continue;
+
+            ApplyAnchor(b, isViolent, applyRotation: false);
+            PlayRandomizedAnimation(b.character, isViolent);
+
+            if (isViolent)
+                FaceTarget(b.character);
+            else
+                b.character.transform.rotation = b.originalRotation; // posa di conversazione
+        }
+    }
+
+    // Cattura posizione e rotazione iniziali di ogni attore
+    private void CaptureOriginals(ViolenceActor[] actors)
+    {
+        if (actors == null) return;
+        foreach (var a in actors)
+        {
+            if (a != null && a.character != null)
             {
-                GameObject b = turningBystanders[i];
-                if (b == null) continue;
-
-                PlayRandomizedAnimation(b, isViolent);
-
-                if (isViolent)
-                    FaceTarget(b);
-                else if (originalRotations != null)
-                    b.transform.rotation = originalRotations[i]; // ripristina la posa di conversazione
+                a.originalPosition = a.character.transform.position;
+                a.originalRotation = a.character.transform.rotation;
             }
+        }
+    }
+
+    // Applica la posizione in base agli anchor. Se nessun anchor e' impostato,
+    // non tocca la posizione (cosi' non interferisce con altri randomizer).
+    private void ApplyAnchor(ViolenceActor a, bool isViolent, bool applyRotation)
+    {
+        bool hasAnyAnchor = a.calmAnchor != null || a.violentAnchor != null;
+        if (!hasAnyAnchor) return;
+
+        Transform anchor = isViolent ? a.violentAnchor : a.calmAnchor;
+
+        if (anchor != null)
+        {
+            a.character.transform.position = anchor.position;
+            if (applyRotation)
+                a.character.transform.rotation = anchor.rotation;
+        }
+        else
+        {
+            // Anchor mancante per questo stato: torna alla posa originale
+            a.character.transform.position = a.originalPosition;
+            if (applyRotation)
+                a.character.transform.rotation = a.originalRotation;
         }
     }
 
