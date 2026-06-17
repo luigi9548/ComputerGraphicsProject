@@ -9,6 +9,7 @@ Progetto per la generazione di dataset sintetici tramite **Unity Perception Pack
   - [CameraRandomizer](#cameraRandomizer)
   - [CharacterRandomizer](#characterrandomizer)
   - [LightingRandomizer](#lightingrandomizer)
+  - [PostProcessingRandomizer e ViolenceRandomizer](#postprocessingrandomizer-e-violencerandomizer)
 - [Labeler](#labeler)
   - [CustomMetricsLabeler](#custommetricslabeler)
 - [Componenti di scena](#componenti-di-scena)
@@ -52,6 +53,11 @@ Simula condizioni di illuminazione ambientale (giorno, notte, tramonto) modifica
 - **Comportamento**: assegna lo skybox a `RenderSettings.skybox`, chiama `DynamicGI.UpdateEnvironment()`, applica intensità/temperatura a tutte le luci `Directional` trovate con `FindObjectsOfType<Light>()`, abilitando `useColorTemperature`.
 - **Campi statici**: `CurrentLightingValues` (`[intensity, temperature]`), `CurrentPresetName`.
 - **Metriche prodotte**: `lighting_values` (float[]), `lighting_preset` (string[]).
+
+### PostProcessingRandomizer e ViolenceRandomizer
+
+- **PostProcessingRandomizer**: espone il campo statico `CurrentPostProcessing` (float[]), letto dal `CustomMetricsLabeler` in `OnBeginRendering()` quando il flag `reportPostProcessing` è attivo, e come metrica `post_processing` con struttura `[contrast, saturation, grain, vignette]`.
+- **ViolenceRandomizer**: modifica dinamicamente le label dei personaggi (`aggressor`, `victim`, `standerby`, `weapon`), assegnate altrimenti in modo statico tramite il componente `Labeling` su ciascuna variante. Usa due campi per personaggio, `calmAnchor` e `violentAnchor`: se entrambi sono `null`, non modifica la posizione e coesiste senza conflitti con `WalkPath`; se assegnati, sovrascrive la posizione impostata da `WalkPath` all'inizio di ogni iterazione. Gestisce inoltre lo stato di animazione del personaggio (`Calm` o `Violent`), eseguito in parallelo dall'Animator senza interferire con la rotazione/direzione calcolata da `WalkPath`.
 
 ---
 
@@ -144,11 +150,3 @@ Script di **ispezione qualitativa** (non fa parte del training set) che genera i
   - `main()`: per ogni frame (fino a `MAX_FRAMES`) genera `<frame_id>_bbox.png`, `<frame_id>_semantic.png`, `<frame_id>_instance.png` nella cartella `visualizations`.
 
 ---
-
-## Relazioni chiave tra i componenti
-
-- I **randomizer** (`CameraRandomizer`, `CharacterRandomizer`, `LightingRandomizer`) operano in `OnIterationStart()` e comunicano i valori applicati tramite **campi statici**.
-- Il **`CustomMetricsLabeler`** legge questi campi in `OnBeginRendering()` (stesso frame) e li scrive come metriche nel dataset, con flag per attivare solo i gruppi pertinenti alla scena.
-- I **Labeler standard** (`BoundingBox2DLabeler`, `SemanticSegmentationLabeler`, `InstanceSegmentationLabeler`) producono il formato di annotazione fisso del Perception Package in `captures.json`; le **metriche** sono il canale aperto per dati custom (illuminazione, camera, post-processing, violenza) in `metrics.json`.
-- Il collegamento tra i due file avviene sempre tramite `sequence_id`.
-- `classify_violence.py` chiude il ciclo aggiungendo a posteriori una label di scena (`scene_violence`) basata sulle bounding box reali, mentre `visualize_annotations.py` fornisce un controllo visivo di qualità su tutto quanto sopra.
