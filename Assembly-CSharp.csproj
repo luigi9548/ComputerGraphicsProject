@@ -56,7 +56,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\Extensions\StringExtensions.cs" />
-    <Compile Include="Assets\Scripts\SkyboxRandomizer.cs" />
+    <Compile Include="Assets\Scripts\LightingRandomizer.cs" />
     <Compile Include="Assets\Scripts\PostProcessingRandomizer.cs" />
     <Compile Include="Assets\Scripts\ViolenceRandomizer.cs" />
     <Compile Include="Assets\ithappy\Creative_Characters_FREE\Scripts\FaceManagement\FaceType.cs" />
